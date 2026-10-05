@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenida - Sistema de Gestión de Tareas</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            max-width: 600px;
+            width: 100%;
+            padding: 35px;
+            text-align: center;
+        }
+        .icon {
+            font-size: 54px;
+            margin-bottom: 15px;
+        }
+        h1 {
+            color: #38bdf8;
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+        p.subtitle {
+            color: #94a3b8;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        .badge {
+            display: inline-block;
+            background: #0ea5e9;
+            color: white;
+            font-weight: 600;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+        .user-panel {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+            border: 1px solid #334155;
+        }
+        .user-panel h2 {
+            font-size: 1.2rem;
+            color: #e2e8f0;
+            margin-bottom: 10px;
+        }
+        .task-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+        .task-item {
+            background: #1e293b;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-left: 4px solid #38bdf8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .task-item.completed {
+            border-left-color: #22c55e;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        .empty-tasks {
+            color: #64748b;
+            font-style: italic;
+            font-size: 0.95rem;
+            text-align: center;
+            padding: 10px 0;
+        }
+        .endpoints-info {
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: left;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            border: 1px solid #334155;
+        }
+        .endpoints-info code {
+            background: #0f172a;
+            color: #f472b6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        .footer {
+            margin-top: 25px;
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="icon">📋✨</div>
+        <span class="badge">API REST con Flask &amp; SQLite</span>
+        <h1>¡Bienvenido al Gestor de Tareas!</h1>
+        <p class="subtitle">
+            Sistema seguro de administración de tareas con contraseñas hasheadas y almacenamiento persistente.
+        </p>
+
+        {% if usuario %}
+        <div class="user-panel">
+            <h2>👋 Sesión iniciada: <strong style="color: #38bdf8;">{{ usuario }}</strong></h2>
+            <p style="color: #94a3b8; font-size: 0.9rem;">Tus tareas registradas:</p>
+            {% if tareas %}
+            <ul class="task-list">
+                {% for t in tareas %}
+                <li class="task-item {% if t.completada %}completed{% endif %}">
+                    <div>
+                        <strong>{{ t.titulo }}</strong>
+                        {% if t.descripcion %}<div style="font-size: 0.85rem; color: #94a3b8;">{{ t.descripcion }}</div>{% endif %}
+                    </div>
+                    <span style="font-size: 0.75rem; color: #64748b;">{{ t.fecha_creacion }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="empty-tasks">No tienes tareas pendientes por el momento.</p>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="user-panel" style="text-align: center;">
+            <h2>👋 Estado: No autenticado</h2>
+            <p style="color: #94a3b8; font-size: 0.95rem; margin-top: 8px;">
+                Para gestionar tus tareas privadas, inicia sesión a través del cliente de consola o enviando credenciales a <code>POST /login</code>.
+            </p>
+        </div>
+        {% endif %}
+
+        <div class="endpoints-info">
+            <strong>Endpoints disponibles:</strong>
+            <ul style="margin-left: 20px; margin-top: 8px; line-height: 1.6; color: #cbd5e1;">
+                <li><code>POST /registro</code>: Registra nuevo usuario</li>
+                <li><code>POST /login</code>: Autentica credenciales</li>
+                <li><code>GET /tareas</code>: Pantalla de bienvenida (HTML)</li>
+                <li><code>GET /api/tareas</code>: Listado de tareas (JSON)</li>
+                <li><code>POST /api/tareas</code>: Crear nueva tarea (JSON)</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            Programación sobre Redes — PFO 2
+        </div>
+    </div>
+</body>
+</html>
