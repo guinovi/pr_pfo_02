@@ -1,4 +1,13 @@
-# PFO 2: Sistema de Gestión de Tareas con API y Base de Datos
+# Programación sobre Redes
+
+- **Materia:** Programación sobre Redes
+- **Curso:** 3° E
+- **Alumno:** Novillo Guillermo Tadeo
+- **Repositorio:** [https://github.com/guinovi/pr_pfo_02](https://github.com/guinovi/pr_pfo_02)
+
+---
+
+## PFO 2: Sistema de Gestión de Tareas con API y Base de Datos
 
 Trabajo práctico N°2 que implementa una **API REST con Flask**, autenticación segura con **contraseñas hasheadas** (mediante `werkzeug.security`), almacenamiento persistente en **SQLite** y un **cliente interactivo por consola**.
 
