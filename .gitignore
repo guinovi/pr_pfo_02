@@ -1,38 +1,18 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-env/
+# Entornos virtuales
+.venv/
 venv/
-ENV/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+env/
 
-# SQLite temporal/pruebas (opcional mantener o excluir bases locales)
-test_gestor_tareas.db
+# Python cache
+__pycache__/
+*.pyc
+
+# Base de datos de pruebas temporales
+test_*.db
 *.sqlite3-journal
 
 # IDEs
-.idea/
 .vscode/
-*.swp
-*.swo
+.idea/
 
-# OS
-.DS_Store
-Thumbs.db
+consignas.md

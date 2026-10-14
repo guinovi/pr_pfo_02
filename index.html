@@ -3,549 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PFO 2: Sistema de Gestión de Tareas | API REST & SQLite</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <title>PFO 2 - Sistema de Gestión de Tareas con API y Base de Datos</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        :root {
-            --bg: #0f172a;
-            --surface: #1e293b;
-            --surface-hover: #334155;
-            --primary: #38bdf8;
-            --primary-glow: rgba(56, 189, 248, 0.25);
-            --accent: #818cf8;
-            --success: #34d399;
-            --danger: #f87171;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --code-bg: #0b1120;
-            --border: #334155;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            line-height: 1.6;
-            padding-bottom: 60px;
-        }
-
-        header {
-            background: linear-gradient(180deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.6) 100%);
-            border-bottom: 1px solid var(--border);
-            padding: 60px 20px 40px;
-            text-align: center;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .badge-header {
-            display: inline-block;
-            background: var(--primary-glow);
-            color: var(--primary);
-            border: 1px solid var(--primary);
-            padding: 6px 16px;
-            border-radius: 9999px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #fff;
-            margin-bottom: 15px;
-            line-height: 1.2;
-        }
-
-        h1 span {
-            background: linear-gradient(90deg, #38bdf8, #818cf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        header p {
-            color: var(--text-muted);
-            font-size: 1.15rem;
-            max-width: 650px;
-            margin: 0 auto 25px;
-        }
-
-        .nav-links {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .btn-primary {
-            background: #0284c7;
-            color: white;
-            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
-        }
-
-        .btn-primary:hover {
-            background: #0369a1;
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: var(--surface);
-            color: var(--text-main);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: var(--surface-hover);
-        }
-
-        section {
-            margin-top: 50px;
-        }
-
-        h2.section-title {
-            font-size: 1.7rem;
-            font-weight: 700;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: var(--text-main);
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 10px;
-        }
-
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-
-        /* Endpoints */
-        .endpoint-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            margin-bottom: 16px;
-            overflow: hidden;
-        }
-
-        .endpoint-header {
-            padding: 14px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: rgba(15, 23, 42, 0.5);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .method {
-            font-family: 'Fira Code', monospace;
-            font-size: 0.85rem;
-            font-weight: 700;
-            padding: 4px 10px;
-            border-radius: 6px;
-            text-transform: uppercase;
-        }
-
-        .method.post { background: #065f46; color: #34d399; }
-        .method.get { background: #075985; color: #38bdf8; }
-        .method.put { background: #854d0e; color: #facc15; }
-        .method.delete { background: #7f1d1d; color: #f87171; }
-
-        .endpoint-path {
-            font-family: 'Fira Code', monospace;
-            font-weight: 600;
-            font-size: 1rem;
-            color: #f1f5f9;
-        }
-
-        .endpoint-body {
-            padding: 18px 20px;
-        }
-
         pre {
-            background: var(--code-bg);
-            border: 1px solid #1e293b;
-            border-radius: 8px;
-            padding: 14px;
-            overflow-x: auto;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.88rem;
-            color: #cbd5e1;
-            margin-top: 10px;
-        }
-
-        /* Conceptual Answers */
-        .qa-card {
-            margin-bottom: 25px;
-            background: var(--surface);
-            border-left: 4px solid var(--primary);
-            border-radius: 0 12px 12px 0;
-            padding: 25px;
-        }
-
-        .qa-card h3 {
-            font-size: 1.3rem;
-            color: var(--primary);
-            margin-bottom: 12px;
-        }
-
-        .qa-card p {
-            color: #cbd5e1;
-            margin-bottom: 12px;
-        }
-
-        .qa-card ul {
-            margin-left: 20px;
-            color: #cbd5e1;
-            margin-bottom: 12px;
-        }
-
-        .qa-card li {
-            margin-bottom: 8px;
-        }
-
-        /* Interactive Simulator */
-        .sim-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .sim-grid { grid-template-columns: 1fr; }
-        }
-
-        .input-group {
-            margin-bottom: 14px;
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            font-weight: 600;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 10px 14px;
-            background: var(--code-bg);
-            border: 1px solid var(--border);
+            background-color: #212529;
+            color: #0dcaf0;
+            padding: 12px;
             border-radius: 6px;
-            color: #fff;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
+            font-size: 0.88rem;
         }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px var(--primary-glow);
+        .hero {
+            background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 40px;
         }
-
-        .sim-box {
-            background: #0b1120;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px;
-            font-family: 'Fira Code', monospace;
-            font-size: 0.85rem;
-            min-height: 220px;
-            max-height: 320px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            color: #38bdf8;
-        }
-
-        footer {
-            margin-top: 70px;
-            text-align: center;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            border-top: 1px solid var(--border);
-            padding-top: 30px;
+        .card-custom {
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            margin-bottom: 24px;
         }
     </style>
 </head>
-<body>
+<body class="bg-light">
 
-    <header>
+    <!-- Header Hero -->
+    <header class="hero text-center">
         <div class="container">
-            <span class="badge-header">Programación sobre Redes — Trabajo Práctico Obligatorio 2</span>
-            <h1>Sistema de Gestión de Tareas con <span>API y SQLite</span></h1>
-            <p>Implementación completa de API REST en Flask, autenticación con contraseñas hasheadas (scrypt/PBKDF2), almacenamiento persistente en SQLite y cliente de consola interactivo.</p>
-            <div class="nav-links">
-                <a href="#endpoints" class="btn btn-primary">📖 Documentación API</a>
-                <a href="#respuestas" class="btn btn-secondary">💡 Respuestas Conceptuales</a>
-                <a href="#simulador" class="btn btn-secondary">⚡ Simulador Interactivo</a>
+            <span class="badge bg-light text-primary mb-2 px-3 py-2">Programación sobre Redes — PFO 2</span>
+            <h1 class="display-5 fw-bold">Sistema de Gestión de Tareas</h1>
+            <p class="lead col-lg-8 mx-auto">
+                API REST en Flask, protección de credenciales con hash criptográfico, persistencia en SQLite y cliente de consola interactivo.
+            </p>
+            <div class="d-flex justify-content-center gap-2 mt-3">
+                <a href="#endpoints" class="btn btn-light text-primary fw-semibold">Endpoints API</a>
+                <a href="#conceptos" class="btn btn-outline-light fw-semibold">Respuestas Conceptuales</a>
+                <a href="#simulador" class="btn btn-warning fw-semibold">Simulador Web</a>
             </div>
         </div>
     </header>
 
     <main class="container">
 
-        <!-- ARQUITECTURA DEL SISTEMA -->
-        <section id="arquitectura">
-            <h2 class="section-title">🏗️ Arquitectura y Objetivos</h2>
-            <div class="card">
-                <p>El proyecto cumple con los 4 pilares fundamentales establecidos en la consigna:</p>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 15px;">
-                    <div style="background: rgba(15,23,42,0.6); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
-                        <strong style="color: var(--primary);">1. API REST Funcional</strong>
-                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">Endpoints organizados para registro, login, consulta HTML y gestión de tareas.</p>
-                    </div>
-                    <div style="background: rgba(15,23,42,0.6); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
-                        <strong style="color: var(--primary);">2. Seguridad de Credenciales</strong>
-                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">Hasheo criptográfico unidireccional con sal mediante <code>werkzeug.security</code>.</p>
-                    </div>
-                    <div style="background: rgba(15,23,42,0.6); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
-                        <strong style="color: var(--primary);">3. Persistencia en SQLite</strong>
-                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">Base de datos relacional local con tablas para usuarios y tareas vinculadas.</p>
-                    </div>
-                    <div style="background: rgba(15,23,42,0.6); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
-                        <strong style="color: var(--primary);">4. Cliente de Consola</strong>
-                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-top: 5px;">Interfaz CLI interactiva (<code>cliente.py</code>) con manejo de sesiones HTTP persistentes.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <!-- Endpoints -->
+        <section id="endpoints" class="mb-5">
+            <h2 class="h3 fw-bold mb-4 text-primary border-bottom pb-2">📡 Endpoints de la API</h2>
 
-        <!-- ENDPOINTS -->
-        <section id="endpoints">
-            <h2 class="section-title">📡 Especificación de Endpoints</h2>
-
-            <div class="endpoint-card">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/registro</span>
+            <div class="card card-custom">
+                <div class="card-header bg-white fw-bold d-flex align-items-center gap-2">
+                    <span class="badge bg-success">POST</span> <code>/registro</code>
                 </div>
-                <div class="endpoint-body">
-                    <p>Registra un nuevo usuario en SQLite. Hashea la contraseña antes de guardarla.</p>
-                    <p style="margin-top: 8px; font-weight: 600;">Cuerpo JSON recibido:</p>
+                <div class="card-body">
+                    <p>Registra un nuevo usuario en SQLite. Hashea la contraseña antes de persistirla en la base de datos.</p>
+                    <strong>Cuerpo JSON recibido:</strong>
                     <pre><code>{
-  "usuario": "estudiante",
-  "contraseña": "clave_segura_123"
+  "usuario": "nombre_usuario",
+  "contraseña": "mi_clave_secreta"
 }</code></pre>
-                    <p style="margin-top: 8px; font-weight: 600;">Respuesta Exitosa (201 Created):</p>
+                    <strong>Respuesta (201 Created):</strong>
                     <pre><code>{
   "mensaje": "Usuario registrado exitosamente",
-  "usuario": "estudiante"
+  "usuario": "nombre_usuario"
 }</code></pre>
                 </div>
             </div>
 
-            <div class="endpoint-card">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/login</span>
+            <div class="card card-custom">
+                <div class="card-header bg-white fw-bold d-flex align-items-center gap-2">
+                    <span class="badge bg-success">POST</span> <code>/login</code>
                 </div>
-                <div class="endpoint-body">
-                    <p>Verifica las credenciales contra el hash en SQLite e inicia sesión.</p>
-                    <p style="margin-top: 8px; font-weight: 600;">Cuerpo JSON recibido:</p>
+                <div class="card-body">
+                    <p>Verifica las credenciales contra el hash en SQLite e inicia sesión con cookies firmadas.</p>
+                    <strong>Cuerpo JSON recibido:</strong>
                     <pre><code>{
-  "usuario": "estudiante",
-  "contraseña": "clave_segura_123"
+  "usuario": "nombre_usuario",
+  "contraseña": "mi_clave_secreta"
 }</code></pre>
-                    <p style="margin-top: 8px; font-weight: 600;">Respuesta Exitosa (200 OK):</p>
+                    <strong>Respuesta exitosa (200 OK):</strong>
                     <pre><code>{
   "mensaje": "Inicio de sesión exitoso",
-  "usuario": "estudiante"
+  "usuario": "nombre_usuario"
 }</code></pre>
                 </div>
             </div>
 
-            <div class="endpoint-card">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/tareas</span>
+            <div class="card card-custom">
+                <div class="card-header bg-white fw-bold d-flex align-items-center gap-2">
+                    <span class="badge bg-primary">GET</span> <code>/tareas</code>
                 </div>
-                <div class="endpoint-body">
-                    <p>Devuelve una <strong>página HTML de bienvenida</strong> (renderizada con motor Jinja2). Si el usuario cuenta con sesión activa, muestra además sus tareas pendientes.</p>
-                    <p style="margin-top: 8px; font-weight: 600;">Tipo de Contenido:</p>
-                    <pre><code>Content-Type: text/html; charset=utf-8</code></pre>
-                </div>
-            </div>
-
-            <div class="endpoint-card">
-                <div class="endpoint-header">
-                    <span class="method get">GET</span>
-                    <span class="endpoint-path">/api/tareas</span>
-                </div>
-                <div class="endpoint-body">
-                    <p>Listado de tareas en formato JSON para el cliente en consola (requiere autenticación).</p>
-                    <pre><code>{
-  "usuario": "estudiante",
-  "tareas": [
-    {
-      "id": 1,
-      "titulo": "Instalar dependencias",
-      "descripcion": "pip install -r requirements.txt",
-      "completada": 1,
-      "fecha_creacion": "2026-10-05 14:00:00"
-    }
-  ]
-}</code></pre>
-                </div>
-            </div>
-
-            <div class="endpoint-card">
-                <div class="endpoint-header">
-                    <span class="method post">POST</span>
-                    <span class="endpoint-path">/api/tareas</span>
-                </div>
-                <div class="endpoint-body">
-                    <p>Crea una nueva tarea vinculada al usuario autenticado en SQLite.</p>
-                    <pre><code>{
-  "titulo": "Nueva tarea",
-  "descripcion": "Detalles opcionales"
-}</code></pre>
+                <div class="card-body">
+                    <p>Muestra una página <strong>HTML de bienvenida</strong> diseñada con Bootstrap por CDN. Si el usuario inició sesión, muestra saludo personalizado y sus tareas.</p>
+                    <p class="text-muted mb-0"><code>Content-Type: text/html; charset=utf-8</code></p>
                 </div>
             </div>
         </section>
 
-        <!-- SIMULADOR INTERACTIVO -->
-        <section id="simulador">
-            <h2 class="section-title">⚡ Simulador Interactivo de la API</h2>
-            <div class="card">
-                <p style="margin-bottom: 20px; color: var(--text-muted);">
-                    Prueba el funcionamiento conceptual de la API directamente desde este navegador (registro con simulación de hash salteado, verificación de login y creación de tareas).
-                </p>
-                <div class="sim-grid">
-                    <div>
-                        <div class="input-group">
-                            <label>Usuario:</label>
-                            <input type="text" id="simUser" value="juan_perez">
-                        </div>
-                        <div class="input-group">
-                            <label>Contraseña:</label>
-                            <input type="password" id="simPass" value="clave123">
-                        </div>
-                        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                            <button onclick="simularRegistro()" class="btn btn-primary" style="flex: 1; justify-content: center; font-size: 0.9rem;">1. Registrar (POST /registro)</button>
-                            <button onclick="simularLogin()" class="btn btn-secondary" style="flex: 1; justify-content: center; font-size: 0.9rem;">2. Login (POST /login)</button>
-                        </div>
-
-                        <div style="border-top: 1px solid var(--border); padding-top: 15px;">
-                            <label style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 6px;">Nueva Tarea:</label>
-                            <input type="text" id="simTareaTitulo" placeholder="Ej: Estudiar para parcial" style="width: 100%; padding: 10px; background: var(--code-bg); border: 1px solid var(--border); border-radius: 6px; color: #fff; margin-bottom: 10px;">
-                            <button onclick="simularCrearTarea()" class="btn btn-secondary" style="width: 100%; justify-content: center; font-size: 0.9rem;">3. Crear Tarea (POST /api/tareas)</button>
+        <!-- Simulador interactivo web -->
+        <section id="simulador" class="mb-5">
+            <h2 class="h3 fw-bold mb-4 text-primary border-bottom pb-2">⚡ Simulador Interactivo de la API</h2>
+            <div class="card card-custom p-4">
+                <p class="text-muted">Prueba en vivo la lógica de registro (con simulación de hash salteado) y validación de login desde el navegador:</p>
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <label class="form-label fw-semibold">Usuario:</label>
+                        <input type="text" id="simUser" class="form-control mb-2" value="usuario">
+                        <label class="form-label fw-semibold">Contraseña:</label>
+                        <input type="password" id="simPass" class="form-control mb-3" value="12345">
+                        <div class="d-flex gap-2">
+                            <button onclick="simRegistro()" class="btn btn-primary w-50">1. Registrar</button>
+                            <button onclick="simLogin()" class="btn btn-outline-primary w-50">2. Login</button>
                         </div>
                     </div>
-                    <div>
-                        <label style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 6px;">Consola de Respuestas & Base de Datos Virtual:</label>
-                        <div id="simLog" class="sim-box">Esperando acciones...
-Presiona "1. Registrar" para comenzar.</div>
+                    <div class="col-md-7">
+                        <label class="form-label fw-semibold">Consola de Respuestas &amp; Base de Datos:</label>
+                        <div id="simLog" class="p-3 bg-dark text-info rounded font-monospace" style="min-height: 170px; white-space: pre-wrap; font-size: 0.85rem;">Presiona "1. Registrar" para comenzar.</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- RESPUESTAS CONCEPTUALES -->
-        <section id="respuestas">
-            <h2 class="section-title">💡 Respuestas Conceptuales</h2>
+        <!-- Respuestas Conceptuales -->
+        <section id="conceptos" class="mb-5">
+            <h2 class="h3 fw-bold mb-4 text-primary border-bottom pb-2">💡 Respuestas a las Preguntas Conceptuales</h2>
 
-            <div class="qa-card">
-                <h3>1. ¿Por qué hashear contraseñas?</h3>
+            <div class="card card-custom p-4 border-start border-primary border-4">
+                <h4 class="fw-bold text-primary">1. ¿Por qué hashear contraseñas?</h4>
                 <p>
-                    Guardar contraseñas en texto plano es una de las vulnerabilidades más críticas en la seguridad informática. El hasheo de contraseñas es imprescindible por las siguientes razones:
+                    Guardar contraseñas en texto plano es una de las fallas de seguridad más graves en el desarrollo de software. El hasheo es indispensable por las siguientes razones:
                 </p>
                 <ul>
                     <li>
-                        <strong>Principio de función unidireccional (One-Way):</strong> Un algoritmo de hash criptográfico transforma cualquier texto plano en una cadena de longitud fija imposible de revertir matemáticamente. No existe una función que permita "deshashear" para obtener la clave original.
+                        <strong>Función Unidireccional (One-Way):</strong> Un hash es un algoritmo matemático diseñado para funcionar en un solo sentido. Transforma cualquier texto plano en una cadena fija imposible de revertir matemáticamente para obtener la clave original.
                     </li>
                     <li>
-                        <strong>Mitigación ante filtraciones (Data Breaches):</strong> Si un atacante accede a la base de datos (por inyección SQL, backup expuesto o acceso indebido al servidor), solo obtendrá los hashes criptográficos y no las claves reales de los usuarios.
+                        <strong>Protección ante Filtraciones de Base de Datos (Data Breaches):</strong> Si un atacante vulnera el servidor o descarga el archivo SQLite, solo obtendrá hashes criptográficos y no las claves de los usuarios.
                     </li>
                     <li>
-                        <strong>Protección del usuario en múltiples servicios:</strong> Gran parte de los usuarios reutiliza contraseñas en distintas plataformas. Si se expusieran en texto plano, el atacante podría vulnerar sus correos, bancos u otros servicios personales.
+                        <strong>Defensa contra la Reutilización de Contraseñas:</strong> La mayoría de los usuarios utiliza la misma contraseña para varios servicios (bancos, correos, redes). Proteger sus claves evita que una brecha en nuestro sistema comprometa sus demás cuentas.
                     </li>
                     <li>
-                        <strong>Salting contra ataques de tablas arcoíris (Rainbow Tables):</strong> Las librerías modernas como <code>werkzeug.security</code> aplican una "sal" criptográfica aleatoria única por cada usuario. Esto asegura que dos contraseñas idénticas generen hashes completamente distintos, inutilizando las tablas de búsqueda precalculadas y ataques masivos por diccionario.
+                        <strong>Salting contra Tablas Arcoíris (Rainbow Tables):</strong> Librerías como <code>werkzeug.security</code> añaden automáticamente una "sal" aleatoria única a cada contraseña. Esto evita que dos contraseñas idénticas generen el mismo hash y neutraliza ataques masivos con diccionarios precalculados.
                     </li>
                 </ul>
             </div>
 
-            <div class="qa-card">
-                <h3>2. Ventajas de usar SQLite en este proyecto</h3>
+            <div class="card card-custom p-4 border-start border-primary border-4">
+                <h4 class="fw-bold text-primary">2. Ventajas de usar SQLite en este proyecto</h4>
                 <p>
-                    SQLite es el motor de base de datos relacional más embebido del mundo, y para este tipo de aplicación ofrece ventajas contundentes:
+                    SQLite es un motor de base de datos relacional ligero y potente que presenta claras ventajas para este trabajo práctico:
                 </p>
                 <ul>
                     <li>
-                        <strong>Cero configuración y sin servidor (Serverless):</strong> A diferencia de motores cliente-servidor como MySQL o PostgreSQL, SQLite no requiere instalar ni administrar un proceso demonio (daemon) separado ni gestionar puertos o permisos de red complejos.
+                        <strong>Sin Servidor (Serverless) y Cero Configuración:</strong> A diferencia de MySQL o PostgreSQL, no requiere instalar ni mantener un servicio demonio corriendo en segundo plano ni configurar puertos o credenciales de conexión al servidor de base de datos.
                     </li>
                     <li>
-                        <strong>Archivo único y portabilidad total:</strong> Toda la base de datos (tablas, índices, registros) se almacena en un único archivo de disco (<code>gestor_tareas.db</code>). Esto facilita copiar el proyecto, realizar backups instantáneos y transportarlo entre diferentes computadoras sin pasos previos.
+                        <strong>Persistencia en un Archivo Único y Portabilidad:</strong> Toda la base de datos (tablas, índices y datos) se guarda en un único archivo (<code>gestor_tareas.db</code>). Esto hace que el proyecto sea 100% portable entre computadoras (Linux, Windows, macOS).
                     </li>
                     <li>
-                        <strong>Integrado nativamente en Python:</strong> Python incluye el módulo estándar <code>sqlite3</code>, eliminando dependencias externas de controladores o librerías de conexión para la base de datos.
+                        <strong>Integración Nativa en Python:</strong> Python incluye el módulo <code>sqlite3</code> en su biblioteca estándar, eliminando la necesidad de instalar dependencias o drivers adicionales.
                     </li>
                     <li>
-                        <strong>Cumplimiento ACID:</strong> Pese a su ligereza, SQLite garantiza Atomicidad, Consistencia, Aislamiento y Durabilidad (ACID), protegiendo la integridad de los datos ante cortes o errores de ejecución.
+                        <strong>Cumplimiento de Estándares ACID:</strong> Garantiza Atomicidad, Consistencia, Aislamiento y Durabilidad, protegiendo la integridad de los datos ante cierres inesperados.
                     </li>
                     <li>
-                        <strong>Rendimiento óptimo para entornos educativos y prototipado:</strong> Para proyectos académicos, prototipos y aplicaciones con cargas ligeras o medianas, SQLite ofrece un acceso a disco de altísima velocidad con una huella de memoria insignificante.
+                        <strong>Rendimiento Óptimo para Entornos Académicos:</strong> Ofrece tiempos de respuesta inmediatos y un consumo de memoria mínimo, ideal para prototipos y sistemas de escala pequeña/mediana.
                     </li>
                 </ul>
             </div>
         </section>
 
-        <!-- INSTRUCCIONES DE EJECUCIÓN -->
-        <section id="ejecucion">
-            <h2 class="section-title">💻 Cómo Ejecutar el Proyecto</h2>
-            <div class="card">
-                <ol style="margin-left: 20px; line-height: 1.8;">
-                    <li><strong>Clonar el repositorio:</strong>
-                        <pre><code>git clone &lt;URL-DE-TU-REPOSITORIO&gt;
-cd tp2</code></pre>
+        <!-- Instrucciones de ejecución -->
+        <section id="ejecucion" class="mb-5">
+            <h2 class="h3 fw-bold mb-4 text-primary border-bottom pb-2">💻 Cómo Ejecutar el Proyecto</h2>
+            <div class="card card-custom p-4">
+                <ol class="mb-0">
+                    <li class="mb-2"><strong>Iniciar el Servidor Flask:</strong>
+                        <pre><code>python servidor.py</code></pre>
                     </li>
-                    <li><strong>Crear el entorno virtual e instalar dependencias:</strong>
-                        <pre><code>python3 -m venv venv
-source venv/bin/activate  # En Linux/Mac
-# o en Windows: venv\Scripts\activate
-pip install -r requirements.txt</code></pre>
+                    <li class="mb-2"><strong>Ejecutar el Cliente de Consola Interactivo:</strong>
+                        <pre><code>python cliente.py</code></pre>
                     </li>
-                    <li><strong>Iniciar el servidor Flask:</strong>
-                        <pre><code>python3 servidor.py</code></pre>
-                        El servidor escuchará peticiones en <code>http://127.0.0.1:5000</code>.
-                    </li>
-                    <li><strong>Ejecutar el cliente en consola:</strong>
-                        <pre><code>python3 cliente.py          # Menú interactivo
-python3 cliente.py --demo   # Demostración automatizada completa</code></pre>
-                    </li>
-                    <li><strong>Ejecutar las pruebas unitarias automatizadas:</strong>
-                        <pre><code>python3 test_servidor.py</code></pre>
+                    <li><strong>Ejecutar Pruebas Automatizadas:</strong>
+                        <pre><code>python test_servidor.py</code></pre>
                     </li>
                 </ol>
             </div>
@@ -553,91 +194,45 @@ python3 cliente.py --demo   # Demostración automatizada completa</code></pre>
 
     </main>
 
-    <footer>
-        <div class="container">
-            <p>Trabajo Práctico Obligatorio 2 — Tecnicatura Universitaria en Redes y Sistemas</p>
-            <p style="margin-top: 5px;">Alojado en GitHub Pages.</p>
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container small">
+            Programación sobre Redes — PFO 2 &bull; Alojado en GitHub Pages
         </div>
     </footer>
 
     <script>
-        // Simulador de base de datos en memoria para la demo interactiva web
-        const dbUsuarios = {};
-        const dbTareas = [];
-        let usuarioLogueado = null;
-
-        // Función simple para simular hashing unidireccional con sal
-        function fakeHash(str, salt) {
+        function fakeHash(pw, salt) {
             let h = 0;
-            const full = salt + "$" + str;
-            for (let i = 0; i < full.length; i++) {
-                h = ((h << 5) - h) + full.charCodeAt(i);
-                h |= 0;
-            }
-            return "scrypt:32768:8:1$" + salt + "$" + Math.abs(h).toString(16).padStart(16, '0') + "abc987654321fedcba";
+            const s = salt + pw;
+            for(let i=0; i<s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; }
+            return "scrypt:32768:8:1$" + salt + "$" + Math.abs(h).toString(16).padStart(16, "0") + "abcd789";
         }
-
-        function log(msg) {
-            const el = document.getElementById("simLog");
-            el.innerText = msg;
-        }
-
-        function simularRegistro() {
+        const defaultSalt = "salt123";
+        const virtualDB = {
+            "usuario": { hash: fakeHash("12345", defaultSalt), salt: defaultSalt }
+        };
+        function simRegistro() {
             const u = document.getElementById("simUser").value.trim();
             const p = document.getElementById("simPass").value.trim();
-            if (!u || !p) {
-                log("❌ Error 400: 'usuario' y 'contraseña' son requeridos.");
-                return;
-            }
-            if (dbUsuarios[u]) {
-                log(`❌ Error 409: El usuario '${u}' ya existe en la base de datos.`);
-                return;
-            }
-            const salt = Math.random().toString(36).substring(2, 10);
+            if(!u || !p) { document.getElementById("simLog").innerText = "❌ Error 400: Campos requeridos."; return; }
+            if(virtualDB[u]) { document.getElementById("simLog").innerText = "❌ Error 409: El usuario ya existe en SQLite."; return; }
+            const salt = Math.random().toString(36).substring(2, 8);
             const hash = fakeHash(p, salt);
-            dbUsuarios[u] = { usuario: u, hash: hash, salt: salt };
-
-            log(`✅ POST /registro -> 201 Created\n\nRespuesta JSON:\n{\n  "mensaje": "Usuario registrado exitosamente",\n  "usuario": "${u}"\n}\n\n[DATO EN SQLite usuarios]:\n- usuario: "${u}"\n- contrasenia_hash: "${hash}"\n(¡Nota cómo la clave nunca se guardó en texto plano!)`);
+            virtualDB[u] = { hash: hash, salt: salt };
+            document.getElementById("simLog").innerText = "✅ POST /registro -> 201 Created\n\n[Guardado en SQLite]:\nUsuario: " + u + "\nHash seguro: " + hash;
         }
-
-        function simularLogin() {
+        function simLogin() {
             const u = document.getElementById("simUser").value.trim();
             const p = document.getElementById("simPass").value.trim();
-
-            if (!dbUsuarios[u]) {
-                log(`❌ Error 401 Unauthorized: Credenciales inválidas (usuario no existe).`);
-                return;
-            }
-
-            const stored = dbUsuarios[u];
-            const testHash = fakeHash(p, stored.salt);
-            if (testHash === stored.hash) {
-                usuarioLogueado = u;
-                log(`✅ POST /login -> 200 OK\n\nRespuesta JSON:\n{\n  "mensaje": "Inicio de sesión exitoso",\n  "usuario": "${u}"\n}\n\nSesión iniciada con éxito para ${u}.`);
+            if(!virtualDB[u]) { document.getElementById("simLog").innerText = "❌ Error 401 Unauthorized: Credenciales inválidas."; return; }
+            const salt = virtualDB[u].salt;
+            if(fakeHash(p, salt) === virtualDB[u].hash) {
+                document.getElementById("simLog").innerText = "✅ POST /login -> 200 OK\nInicio de sesión exitoso para " + u + "!";
             } else {
-                log(`❌ Error 401 Unauthorized: Contraseña incorrecta. El hash calculado no coincide con el guardado.`);
+                document.getElementById("simLog").innerText = "❌ Error 401 Unauthorized: Contraseña incorrecta. El hash no coincide.";
             }
-        }
-
-        function simularCrearTarea() {
-            if (!usuarioLogueado) {
-                log("🔒 Error 401 Unauthorized: Debes iniciar sesión primero para gestionar tareas.");
-                return;
-            }
-            const titulo = document.getElementById("simTareaTitulo").value.trim();
-            if (!titulo) {
-                log("❌ Error 400: El título de la tarea es obligatorio.");
-                return;
-            }
-            const t = { id: dbTareas.length + 1, usuario: usuarioLogueado, titulo: titulo, completada: 0 };
-            dbTareas.push(t);
-
-            const misTareas = dbTareas.filter(item => item.usuario === usuarioLogueado);
-            let listaStr = misTareas.map(item => `  - [${item.id}] [PENDIENTE] ${item.titulo}`).join("\n");
-
-            log(`✅ POST /api/tareas -> 201 Created\nTarea ID ${t.id} guardada en SQLite.\n\nGET /api/tareas actual de ${usuarioLogueado}:\n${listaStr}`);
-            document.getElementById("simTareaTitulo").value = "";
         }
     </script>
 </body>
 </html>
+

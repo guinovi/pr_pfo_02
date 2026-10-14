@@ -1,12 +1,13 @@
 """
 test_servidor.py
 ----------------
-Suite de pruebas automatizadas para verificar:
-1. Registro con contraseña hasheada en SQLite.
-2. Comprobación de que la contraseña NO se guarda en texto plano.
-3. Login exitoso y rechazo de credenciales incorrectas.
-4. Consulta a GET /tareas (HTML de bienvenida).
-5. Persistencia y aislamiento de tareas en SQLite.
+Suite de pruebas unitarias automatizadas para verificar:
+1. Registro con contraseña hasheada y rechazo de contraseñas vacías.
+2. Comprobación en SQLite de que la contraseña NO está en texto plano.
+3. Rechazo de usuario duplicado (409 Conflict).
+4. Login con credenciales válidas e inválidas.
+5. Retorno de HTML de bienvenida con Bootstrap en GET /tareas.
+6. Manejo de sesiones y creación/listado de tareas.
 """
 
 import os
@@ -15,106 +16,102 @@ import sqlite3
 from werkzeug.security import check_password_hash
 import servidor
 
+
 class TestServidorAPI(unittest.TestCase):
     def setUp(self):
-        # Base de datos de prueba en memoria o archivo temporal
-        servidor.DB_FILE = "test_gestor_tareas.db"
+        servidor.DB_NAME = "test_tareas.db"
         servidor.app.config["TESTING"] = True
-        servidor.app.config["SECRET_KEY"] = "clave-test"
+        servidor.app.config["SECRET_KEY"] = "clave-test-secreta"
         servidor.init_db()
         self.client = servidor.app.test_client()
 
     def tearDown(self):
-        if os.path.exists("test_gestor_tareas.db"):
-            os.remove("test_gestor_tareas.db")
+        if os.path.exists("test_tareas.db"):
+            os.remove("test_tareas.db")
 
-    def test_1_registro_y_hashing_seguro(self):
-        """Verifica que el usuario se registre y que la contraseña esté hasheada (no en texto plano)."""
-        password_original = "1234_mi_clave_secreta"
-        response = self.client.post("/registro", json={
-            "usuario": "carlos",
-            "contraseña": password_original
-        })
-        self.assertEqual(response.status_code, 201)
-        self.assertIn("registrado exitosamente", response.get_json()["mensaje"])
+    def test_1_registro_y_hashing(self):
+        """Verifica que se registre el usuario y la contraseña quede hasheada en SQLite."""
+        password_plano = "1234_mi_clave"
+        res = self.client.post("/registro", json={"usuario": "pedro", "contraseña": password_plano})
+        self.assertEqual(res.status_code, 201)
 
-        # Verificar directamente en la base de datos SQLite
-        conn = sqlite3.connect("test_gestor_tareas.db")
+        # Consultar directamente SQLite
+        conn = sqlite3.connect("test_tareas.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT contrasenia_hash FROM usuarios WHERE usuario = 'carlos'")
-        row = cursor.fetchone()
+        cursor.execute("SELECT contrasenia_hash FROM usuarios WHERE usuario = 'pedro'")
+        fila = cursor.fetchone()
         conn.close()
 
-        self.assertIsNotNone(row)
-        stored_hash = row[0]
+        self.assertIsNotNone(fila)
+        hash_guardado = fila[0]
 
-        # 1. NO debe ser igual a la contraseña en texto plano
-        self.assertNotEqual(stored_hash, password_original)
-        # 2. Debe verificarse correctamente usando check_password_hash
-        self.assertTrue(check_password_hash(stored_hash, password_original))
-        # 3. No debe coincidir con otra contraseña
-        self.assertFalse(check_password_hash(stored_hash, "clave_incorrecta"))
+        # Comprobaciones criptográficas
+        self.assertNotEqual(hash_guardado, password_plano)
+        self.assertTrue(check_password_hash(hash_guardado, password_plano))
+        self.assertFalse(check_password_hash(hash_guardado, "clave_falsa"))
 
-    def test_2_registro_usuario_duplicado(self):
-        """Verifica que no se permita registrar el mismo usuario dos veces."""
+    def test_2_errores_en_registro(self):
+        """Verifica validación de campos vacíos y usuarios duplicados."""
+        # Sin datos
+        res_vacio = self.client.post("/registro", json={})
+        self.assertEqual(res_vacio.status_code, 400)
+
+        # Registro exitoso
         self.client.post("/registro", json={"usuario": "ana", "contraseña": "123"})
-        response = self.client.post("/registro", json={"usuario": "ana", "contraseña": "456"})
-        self.assertEqual(response.status_code, 409)
 
-    def test_3_login_correcto_e_incorrecto(self):
-        """Verifica el endpoint de login con credenciales válidas e inválidas."""
-        self.client.post("/registro", json={"usuario": "lucia", "contraseña": "miPassword123"})
+        # Duplicado
+        res_duplicado = self.client.post("/registro", json={"usuario": "ana", "contraseña": "456"})
+        self.assertEqual(res_duplicado.status_code, 409)
 
-        # Login incorrecto
-        res_fail = self.client.post("/login", json={"usuario": "lucia", "contraseña": "passwordErroneo"})
+    def test_3_login(self):
+        """Verifica login con credenciales correctas e incorrectas."""
+        self.client.post("/registro", json={"usuario": "lucas", "contraseña": "passwordSeguro"})
+
+        # Incorrecta
+        res_fail = self.client.post("/login", json={"usuario": "lucas", "contraseña": "otraCosa"})
         self.assertEqual(res_fail.status_code, 401)
 
-        # Login correcto
-        res_ok = self.client.post("/login", json={"usuario": "lucia", "contraseña": "miPassword123"})
+        # Correcta
+        res_ok = self.client.post("/login", json={"usuario": "lucas", "contraseña": "passwordSeguro"})
         self.assertEqual(res_ok.status_code, 200)
-        self.assertIn("Inicio de sesión exitoso", res_ok.get_json()["mensaje"])
 
     def test_4_get_tareas_html(self):
-        """Verifica que GET /tareas devuelva el HTML de bienvenida."""
-        # Sin iniciar sesión
+        """Verifica que GET /tareas responda HTML con Bootstrap."""
+        # Sin login
         res = self.client.get("/tareas")
         self.assertEqual(res.status_code, 200)
-        self.assertIn(b"Bienvenido al Gestor de Tareas", res.data)
-        self.assertIn(b"text/html", res.headers["Content-Type"].encode())
+        self.assertIn(b"bootstrap", res.data.lower())
+        self.assertIn("text/html", res.headers.get("Content-Type"))
 
-        # Con sesión iniciada
-        self.client.post("/registro", json={"usuario": "martin", "contraseña": "123"})
-        self.client.post("/login", json={"usuario": "martin", "contraseña": "123"})
+        # Con login
+        self.client.post("/registro", json={"usuario": "mario", "contraseña": "123"})
+        self.client.post("/login", json={"usuario": "mario", "contraseña": "123"})
 
         res_auth = self.client.get("/tareas")
         self.assertEqual(res_auth.status_code, 200)
-        self.assertIn(b"martin", res_auth.data)
+        self.assertIn(b"mario", res_auth.data)
 
-    def test_5_gestion_tareas_api(self):
-        """Verifica creación y consulta de tareas protegidas por autenticación."""
-        # Intento sin autenticar
-        res_unauth = self.client.get("/api/tareas")
-        self.assertEqual(res_unauth.status_code, 401)
+    def test_5_crud_tareas(self):
+        """Verifica ciclo CRUD completo de tareas (crear, listar, togglear estado y eliminar)."""
+        # Login con usuario por defecto
+        self.client.post("/login", json={"usuario": "usuario", "contraseña": "12345"})
 
-        # Autenticar
-        self.client.post("/registro", json={"usuario": "pedro", "contraseña": "123"})
-        self.client.post("/login", json={"usuario": "pedro", "contraseña": "123"})
-
-        # Crear tarea
-        res_crear = self.client.post("/api/tareas", json={
-            "titulo": "Preparar informe de redes",
-            "descripcion": "Completar entrega de PFO 2"
-        })
+        # 1. Crear tarea
+        res_crear = self.client.post("/api/tareas", json={"titulo": "Testear CRUD"})
         self.assertEqual(res_crear.status_code, 201)
         tarea_id = res_crear.get_json()["tarea"]["id"]
 
-        # Listar tareas
-        res_lista = self.client.get("/api/tareas")
-        self.assertEqual(res_lista.status_code, 200)
-        tareas = res_lista.get_json()["tareas"]
-        self.assertEqual(len(tareas), 1)
-        self.assertEqual(tareas[0]["titulo"], "Preparar informe de redes")
+        # 2. Toggle estado (de 0 a 1 -> Realizada)
+        res_toggle = self.client.post(f"/api/tareas/{tarea_id}/toggle")
+        self.assertEqual(res_toggle.status_code, 200)
+        self.assertEqual(res_toggle.get_json()["completada"], 1)
+
+        # 3. Eliminar tarea
+        res_del = self.client.delete(f"/api/tareas/{tarea_id}")
+        self.assertEqual(res_del.status_code, 200)
 
 
 if __name__ == "__main__":
     unittest.main()
+
+

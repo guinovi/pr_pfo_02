@@ -4,172 +4,217 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bienvenida - Sistema de Gestión de Tareas</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            color: #f8fafc;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .card {
-            background: rgba(30, 41, 59, 0.85);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-            max-width: 600px;
-            width: 100%;
-            padding: 35px;
-            text-align: center;
-        }
-        .icon {
-            font-size: 54px;
-            margin-bottom: 15px;
-        }
-        h1 {
-            color: #38bdf8;
-            font-size: 2rem;
-            margin-bottom: 12px;
-        }
-        p.subtitle {
-            color: #94a3b8;
-            font-size: 1.1rem;
-            margin-bottom: 25px;
-            line-height: 1.5;
-        }
-        .badge {
-            display: inline-block;
-            background: #0ea5e9;
-            color: white;
-            font-weight: 600;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            margin-bottom: 20px;
-        }
-        .user-panel {
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: left;
-            border: 1px solid #334155;
-        }
-        .user-panel h2 {
-            font-size: 1.2rem;
-            color: #e2e8f0;
-            margin-bottom: 10px;
-        }
-        .task-list {
-            list-style: none;
-            margin-top: 15px;
-        }
-        .task-item {
-            background: #1e293b;
-            padding: 12px 15px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            border-left: 4px solid #38bdf8;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .task-item.completed {
-            border-left-color: #22c55e;
-            text-decoration: line-through;
-            opacity: 0.7;
-        }
-        .empty-tasks {
-            color: #64748b;
-            font-style: italic;
-            font-size: 0.95rem;
-            text-align: center;
-            padding: 10px 0;
-        }
-        .endpoints-info {
-            background: rgba(15, 23, 42, 0.4);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: left;
-            margin-top: 20px;
-            font-size: 0.9rem;
-            border: 1px solid #334155;
-        }
-        .endpoints-info code {
-            background: #0f172a;
-            color: #f472b6;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-        .footer {
-            margin-top: 25px;
-            font-size: 0.8rem;
-            color: #64748b;
-        }
-    </style>
+    <!-- Bootstrap 5 por CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <div class="card">
-        <div class="icon">📋✨</div>
-        <span class="badge">API REST con Flask &amp; SQLite</span>
-        <h1>¡Bienvenido al Gestor de Tareas!</h1>
-        <p class="subtitle">
-            Sistema seguro de administración de tareas con contraseñas hasheadas y almacenamiento persistente.
-        </p>
+<body class="bg-light">
 
-        {% if usuario %}
-        <div class="user-panel">
-            <h2>👋 Sesión iniciada: <strong style="color: #38bdf8;">{{ usuario }}</strong></h2>
-            <p style="color: #94a3b8; font-size: 0.9rem;">Tus tareas registradas:</p>
-            {% if tareas %}
-            <ul class="task-list">
-                {% for t in tareas %}
-                <li class="task-item {% if t.completada %}completed{% endif %}">
-                    <div>
-                        <strong>{{ t.titulo }}</strong>
-                        {% if t.descripcion %}<div style="font-size: 0.85rem; color: #94a3b8;">{{ t.descripcion }}</div>{% endif %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-primary text-white text-center py-3">
+                        <h4 class="mb-0">📋 Sistema de Gestión de Tareas</h4>
+                        <small>Programación sobre Redes — PFO 2</small>
                     </div>
-                    <span style="font-size: 0.75rem; color: #64748b;">{{ t.fecha_creacion }}</span>
-                </li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <p class="empty-tasks">No tienes tareas pendientes por el momento.</p>
-            {% endif %}
-        </div>
-        {% else %}
-        <div class="user-panel" style="text-align: center;">
-            <h2>👋 Estado: No autenticado</h2>
-            <p style="color: #94a3b8; font-size: 0.95rem; margin-top: 8px;">
-                Para gestionar tus tareas privadas, inicia sesión a través del cliente de consola o enviando credenciales a <code>POST /login</code>.
-            </p>
-        </div>
-        {% endif %}
 
-        <div class="endpoints-info">
-            <strong>Endpoints disponibles:</strong>
-            <ul style="margin-left: 20px; margin-top: 8px; line-height: 1.6; color: #cbd5e1;">
-                <li><code>POST /registro</code>: Registra nuevo usuario</li>
-                <li><code>POST /login</code>: Autentica credenciales</li>
-                <li><code>GET /tareas</code>: Pantalla de bienvenida (HTML)</li>
-                <li><code>GET /api/tareas</code>: Listado de tareas (JSON)</li>
-                <li><code>POST /api/tareas</code>: Crear nueva tarea (JSON)</li>
-            </ul>
-        </div>
+                    <div class="card-body p-4">
 
-        <div class="footer">
-            Programación sobre Redes — PFO 2
+                        {% if error == 'credenciales_invalidas' %}
+                            <div class="alert alert-danger py-2 text-center" role="alert">
+                                ❌ <strong>Error:</strong> Credenciales inválidas. Comprueba el usuario y contraseña.
+                            </div>
+                        {% elif error == 'campos_faltantes' %}
+                            <div class="alert alert-warning py-2 text-center" role="alert">
+                                ⚠️ <strong>Atención:</strong> Debes ingresar usuario y contraseña.
+                            </div>
+                        {% endif %}
+
+                        {% if usuario %}
+                            <!-- ========================================== -->
+                            <!-- VISTA: USUARIO LOGUEADO (BIENVENIDA + TAREAS) -->
+                            <!-- ========================================== -->
+                            <div class="alert alert-success d-flex justify-content-between align-items-center mb-4" role="alert">
+                                <div>
+                                    🎉 <strong>¡Bienvenido/a, {{ usuario }}!</strong>
+                                    <div class="small text-muted">Acceso autorizado al gestor de tareas.</div>
+                                </div>
+                                <a href="/logout" class="btn btn-outline-danger btn-sm">Cerrar Sesión</a>
+                            </div>
+
+                            <h6 class="text-secondary mb-3">Tus tareas en SQLite:</h6>
+                            {% if tareas %}
+                                <ul class="list-group mb-4">
+                                    {% for t in tareas %}
+                                        <li class="list-group-item d-flex justify-content-between align-items-center py-2">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <button onclick="toggleTarea({{ t.id }})" 
+                                                        class="btn btn-sm {% if t.completada %}btn-success{% else %}btn-outline-warning text-dark{% endif %}"
+                                                        title="Clic para cambiar estado">
+                                                    {% if t.completada %}✔ Realizada{% else %}⏳ Pendiente{% endif %}
+                                                </button>
+                                                <span class="{% if t.completada %}text-decoration-line-through text-muted{% else %}fw-medium{% endif %}">
+                                                    {{ t.titulo }}
+                                                </span>
+                                            </div>
+                                            <button onclick="eliminarTarea({{ t.id }})" class="btn btn-outline-danger btn-sm" title="Eliminar tarea">
+                                                🗑
+                                            </button>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <div class="alert alert-info py-2 text-center mb-4">
+                                    Aún no tienes tareas registradas.
+                                </div>
+                            {% endif %}
+
+                            <!-- Formulario rápido para crear tarea -->
+                            <div class="card bg-light border p-3">
+                                <h6 class="card-title text-muted mb-2">Agregar nueva tarea:</h6>
+                                <form id="formTarea" onsubmit="crearTarea(event)">
+                                    <div class="input-group">
+                                        <input type="text" id="nuevaTareaTitulo" class="form-control" placeholder="Ej: Estudiar para el examen de Redes" required>
+                                        <button class="btn btn-primary" type="submit">Agregar</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                        {% else %}
+                            <!-- ========================================== -->
+                            <!-- VISTA: NO LOGUEADO (LOGIN DIRECTO)         -->
+                            <!-- ========================================== -->
+                            <div class="text-center mb-3">
+                                <h5>👋 Bienvenido al Gestor de Tareas</h5>
+                                <p class="text-muted small">
+                                    Inicia sesión para acceder a tu panel de tareas privadas.
+                                </p>
+                            </div>
+
+                            <!-- Banner con credenciales por defecto para el profesor -->
+                            <div class="alert alert-info py-3 mb-4 border-info">
+                                <h6 class="alert-heading fw-bold mb-1">🔑 Credenciales por defecto (Evaluación):</h6>
+                                <div class="small">
+                                    &bull; <strong>Usuario:</strong> <code>usuario</code><br>
+                                    &bull; <strong>Contraseña:</strong> <code>12345</code>
+                                </div>
+                            </div>
+
+                            <!-- Formulario de Login -->
+                            <form action="/login" method="POST" class="mb-3">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small">Usuario:</label>
+                                    <input type="text" name="usuario" class="form-control" value="usuario" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small">Contraseña:</label>
+                                    <input type="password" name="contraseña" class="form-control" value="12345" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                                    Iniciar Sesión y Entrar a /tareas
+                                </button>
+                            </form>
+
+                            <!-- Acordeón para registrar usuario nuevo -->
+                            <div class="accordion" id="accordionRegistro">
+                                <div class="accordion-item border-0">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed px-0 text-primary small bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRegistro">
+                                            ¿No tienes cuenta? Registra un nuevo usuario aquí
+                                        </button>
+                                    </h2>
+                                    <div id="collapseRegistro" class="accordion-collapse collapse">
+                                        <div class="accordion-body px-0 pt-2">
+                                            <form action="/registro" method="POST">
+                                                <div class="mb-2">
+                                                    <input type="text" name="usuario" class="form-control form-control-sm" placeholder="Nuevo usuario" required>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <input type="password" name="contraseña" class="form-control form-control-sm" placeholder="Nueva contraseña" required>
+                                                </div>
+                                                <button type="submit" class="btn btn-outline-success btn-sm w-100">
+                                                    Registrar usuario
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        {% endif %}
+
+                        <hr class="my-4">
+
+                        <!-- Resumen técnico de la API -->
+                        <div class="text-start">
+                            <h6 class="text-muted small mb-2">Endpoints disponibles:</h6>
+                            <ul class="list-group list-group-flush small">
+                                <li class="list-group-item px-0 py-1"><code>POST /registro</code>: Registra usuario con contraseña hasheada</li>
+                                <li class="list-group-item px-0 py-1"><code>POST /login</code>: Verifica hash y deriva a <code>/tareas</code></li>
+                                <li class="list-group-item px-0 py-1"><code>GET /tareas</code>: HTML de bienvenida (Bootstrap CDN)</li>
+                                <li class="list-group-item px-0 py-1"><code>GET /api/tareas</code>: Listado de tareas (JSON)</li>
+                            </ul>
+                        </div>
+
+                    </div>
+                    <div class="card-footer text-muted text-center py-2 small">
+                        Flask &amp; SQLite &bull; Programación sobre Redes
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function crearTarea(event) {
+            event.preventDefault();
+            const input = document.getElementById("nuevaTareaTitulo");
+            const titulo = input.value.trim();
+            if (!titulo) return;
+
+            fetch("/api/tareas", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ titulo: titulo })
+            })
+            .then(r => {
+                if (!r.ok) throw new Error("Error en la petición: " + r.status);
+                return r.json();
+            })
+            .then(() => window.location.reload())
+            .catch(err => alert("Error al crear tarea: " + err));
+        }
+
+        function toggleTarea(id) {
+            fetch(`/api/tareas/${id}/toggle`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(r => {
+                if (!r.ok) throw new Error("Error al cambiar estado");
+                return r.json();
+            })
+            .then(() => window.location.reload())
+            .catch(err => alert("Error: " + err));
+        }
+
+        function eliminarTarea(id) {
+            if (confirm("¿Deseas eliminar esta tarea?")) {
+                fetch(`/api/tareas/${id}`, {
+                    method: "DELETE"
+                })
+                .then(r => {
+                    if (!r.ok) throw new Error("Error al eliminar la tarea");
+                    return r.json();
+                })
+                .then(() => window.location.reload())
+                .catch(err => alert("Error: " + err));
+            }
+        }
+    </script>
 </body>
 </html>
