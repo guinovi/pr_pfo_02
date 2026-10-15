@@ -4,6 +4,7 @@
 - **Curso:** 3° E
 - **Alumno:** Novillo Guillermo Tadeo
 - **Repositorio:** [https://github.com/guinovi/pr_pfo_02](https://github.com/guinovi/pr_pfo_02)
+- **GitHub Pages:** [https://guinovi.github.io/pr_pfo_02/](https://guinovi.github.io/pr_pfo_02/)
 
 ---
 
